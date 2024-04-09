@@ -356,7 +356,7 @@ class Keycloak(object):
             session.pop(self._nonce_session_key)
 
         if self._validate_auth_token:
-            self.verify_token(access_token)
+            self.verify_token(access_token, audience=self._audience)
 
         token_model = KeycloakAuthToken(
             access_token=access_token,
@@ -437,7 +437,7 @@ class Keycloak(object):
         if "logout_token" not in data:
             return Response("logout_token not in data")
 
-        data_decoded = self.verify_token(data.get('logout_token'), audience=self.client_id)
+        data_decoded = self.verify_token(data.get('logout_token'), audience=self._audience)
         if self._fn_after_logout_request:
             return await self._fn_after_logout_request(KeycloakLogoutRequest(**data_decoded))
         return Response("OK")
